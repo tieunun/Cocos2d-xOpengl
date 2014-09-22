@@ -2,6 +2,17 @@
 
 USING_NS_CC;
 
+
+HelloWorld::~HelloWorld()
+{
+	glDeleteProgram(shader);
+	glDeleteBuffers(1,&vertexObj);
+	glDeleteBuffers(1,&indexObj);
+	glDeleteTextures(1,&texture);
+	glDeleteTextures(1,&uvObj);
+}
+
+
 Scene* HelloWorld::createScene()
 {
     // 'scene' is an autorelease object
@@ -16,17 +27,7 @@ Scene* HelloWorld::createScene()
     // return the scene
     return scene;
 }
-const char *sample_vs = "\
-						attribute vec3 vertex;\
-						void main(void){\
-						gl_Position = vec4(vertex,1);\
-						}\
-						";
 
-const char *sample_fs = "\
-						void main(void){\
-						gl_FragColor = vec4(1,0,0,1);\
-						}";
 // on "init" you need to initialize your instance
 bool HelloWorld::init()
 {
@@ -157,14 +158,38 @@ bool HelloWorld::init()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 
 
-	unsigned int glTex = 0;
-	glGenTextures(1,&glTex);
-	glBindTexture(GL_TEXTURE_2D,glTex);
-
 #endif // 0
 
 
+	unsigned char textureByte[][4] = {
+		{255,255,255,255}
+	};
+
+	//テクスチャ生成.
+	glGenTextures(1,&texture);
+	
+
+	glBindTexture(GL_TEXTURE_2D,texture);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,1,1,0,GL_RGBA,GL_UNSIGNED_BYTE,textureByte);
+	
+	GLenum error = glGetError();
     
+
+	float triangleUV[4][2] = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+	//UV生成.
+	glGenBuffers(1,&uvObj);
+	glBindBuffer(GL_ARRAY_BUFFER,uvObj);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*2*4, triangleUV, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
     return true;
 }
 
@@ -203,13 +228,20 @@ void HelloWorld::draw(cocos2d::Renderer *renderer, const cocos2d::Mat4& transfor
 	glGetIntegerv(GL_CURRENT_PROGRAM,&nowPG);
 	glUseProgram(shader);
 
-	unsigned int attr = glGetAttribLocation(shader,"vertex");
-
 	//アトリビュートに頂点バッファをバインド.
+	unsigned int attr = glGetAttribLocation(shader,"vertex");
 	glBindBuffer(GL_ARRAY_BUFFER,vertexObj);
 	glVertexAttribPointer(attr,3,GL_FLOAT,GL_FALSE,0,NULL);
-
 	glEnableVertexAttribArray(attr);
+	//UVをバインド.
+	attr = glGetAttribLocation(shader, "uv");
+	glBindBuffer(GL_ARRAY_BUFFER, uvObj);
+	glVertexAttribPointer(attr, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glEnableVertexAttribArray(attr);
+	//テクスチャ設定.
+	glBindTexture(GL_TEXTURE_2D, texture);
+
 	////インデックスバッファ.
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexObj);
 	////描画命令.

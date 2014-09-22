@@ -20,6 +20,7 @@ public:
     CREATE_FUNC(HelloWorld);
 
 
+	~HelloWorld();
 
 	//-------------------------------------------------------------------------------------------------------------------------------------
 	//! @brief ÉVÅ[Éìï`âÊä÷êî.
@@ -27,7 +28,8 @@ public:
 	void draw(cocos2d::Renderer *renderer, const cocos2d::Mat4& transform, uint32_t flags);
 protected:
 
-	unsigned int shader,vertexObj,indexObj;
+	unsigned int shader,vertexObj,indexObj,uvObj;
+	GLuint texture;
 };
 
 #endif // __HELLOWORLD_SCENE_H__
