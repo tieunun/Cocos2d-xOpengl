@@ -132,10 +132,10 @@ bool HelloWorld::init()
 
 
 	cocos2d::Vec3 triangleVertex[] = {
-		Vec3(0.5,0.5,0),
 		Vec3(-0.5,0.5,0),
-		Vec3(0.5,-0.5,0),
 		Vec3(-0.5,-0.5,0),
+		Vec3(0.5,0.5,0),
+		Vec3(0.5,-0.5,0),
 	};
 	unsigned short triangleIndex[] ={
 		0,1,2,
@@ -162,7 +162,8 @@ bool HelloWorld::init()
 
 
 	unsigned char textureByte[][4] = {
-		{255,255,255,255}
+		{255,0,0,255},{255,255,0,255},
+		{0,255,0,255},{0,0,255,255},
 	};
 
 	//テクスチャ生成.
@@ -170,11 +171,11 @@ bool HelloWorld::init()
 	
 
 	glBindTexture(GL_TEXTURE_2D,texture);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
-	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,1,1,0,GL_RGBA,GL_UNSIGNED_BYTE,textureByte);
+	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,2,2,0,GL_RGBA,GL_UNSIGNED_BYTE,textureByte);
 	
 	GLenum error = glGetError();
     
