@@ -166,6 +166,9 @@ bool HelloWorld::init()
 		{0,255,0,255},{0,0,255,255},
 	};
 
+	auto image = new cocos2d::Image();
+	image->initWithImageFile("HelloWorld.png");
+
 	//テクスチャ生成.
 	glGenTextures(1,&texture);
 	
@@ -175,7 +178,19 @@ bool HelloWorld::init()
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
-	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,2,2,0,GL_RGBA,GL_UNSIGNED_BYTE,textureByte);
+	//glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,2,2,0,GL_RGBA,GL_UNSIGNED_BYTE,textureByte);
+	
+	GLuint format = 0;
+	switch(image->getRenderFormat())
+	{
+	case cocos2d::Texture2D::PixelFormat::RGB888:
+		format = GL_RGB;
+		break;
+	case cocos2d::Texture2D::PixelFormat::RGBA8888:
+		format = GL_RGBA;
+		break;
+	}
+	glTexImage2D(GL_TEXTURE_2D,0,format,image->getWidth(),image->getHeight(),0,format,GL_UNSIGNED_BYTE,image->getData());
 	
 	GLenum error = glGetError();
     
