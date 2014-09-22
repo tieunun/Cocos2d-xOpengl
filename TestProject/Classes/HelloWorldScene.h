@@ -2,6 +2,7 @@
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
+#include "Utility.h"
 
 class HelloWorld : public cocos2d::Layer
 {
@@ -19,9 +20,14 @@ public:
     CREATE_FUNC(HelloWorld);
 
 
-	virtual void draw(cocos2d::Renderer *renderer, const cocos2d::Mat4& transform, uint32_t flags);
+
+	//-------------------------------------------------------------------------------------------------------------------------------------
+	//! @brief ÉVÅ[Éìï`âÊä÷êî.
+	//-------------------------------------------------------------------------------------------------------------------------------------
+	void draw(cocos2d::Renderer *renderer, const cocos2d::Mat4& transform, uint32_t flags);
 protected:
-	cocos2d::Texture2D* m_pTexture;
+
+	unsigned int shader,vertexObj,indexObj;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

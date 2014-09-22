@@ -21,7 +21,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
     if(!glview) 
 	{
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-		glview = GLView::createWithRect(TITLE,cocos2d::Rect(0,0,WIDTH,HEIGHT));
+		glview = GLView::create(TITLE);
+		//glview = GLView::createWithRect(TITLE,cocos2d::Rect(0,0,WIDTH,HEIGHT));
 #else
         glview = GLView::create(TITLE);
 #endif
