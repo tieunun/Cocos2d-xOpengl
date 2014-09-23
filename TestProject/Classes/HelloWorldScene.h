@@ -2,7 +2,9 @@
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
-#include "Utility.h"
+#include "KJHUtility.h"
+#include "KJHMesh.h"
+#include "KJHMath.h"
 
 class HelloWorld : public cocos2d::Layer
 {
@@ -30,6 +32,8 @@ protected:
 
 	unsigned int shader,vertexObj,indexObj,uvObj;
 	GLuint texture;
+
+	KJH::Mesh mesh;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

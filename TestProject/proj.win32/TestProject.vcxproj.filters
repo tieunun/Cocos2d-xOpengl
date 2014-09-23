@@ -21,7 +21,16 @@
     <ClCompile Include="..\Classes\HelloWorldScene.cpp">
       <Filter>Classes</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Utility.cpp">
+    <ClCompile Include="..\Classes\KJHMath.cpp">
+      <Filter>Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\KJHUtility.cpp">
+      <Filter>Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\KJHMesh.cpp">
+      <Filter>Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\KJHTexture.cpp">
       <Filter>Classes</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,7 +44,16 @@
     <ClInclude Include="..\Classes\HelloWorldScene.h">
       <Filter>Classes</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Utility.h">
+    <ClInclude Include="..\Classes\KJHMath.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\KJHUtility.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\KJHMesh.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\KJHTexture.h">
       <Filter>Classes</Filter>
     </ClInclude>
   </ItemGroup>

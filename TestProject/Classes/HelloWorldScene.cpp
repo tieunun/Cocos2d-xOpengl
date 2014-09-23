@@ -33,11 +33,12 @@ bool HelloWorld::init()
 {
     //////////////////////////////
     // 1. super init first
-    if ( !Layer::init() )
-    {
-        return false;
-    }
-    
+	if( !Layer::init() )
+	{
+		return false;
+	}
+	glClearColor(1.0,0.7,0.7,1.0);
+
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
@@ -109,8 +110,6 @@ bool HelloWorld::init()
 	this->addChild(sprite, 0);  
 #endif // 0
 
-//	KJH::VSCreateShader("shader.vsh");
-
 	//シェーダーのコンパイル.
 #if 1
 	GLuint vs = KJH::VSCreateShader("shader.vsh");
@@ -172,10 +171,9 @@ bool HelloWorld::init()
 	//テクスチャ生成.
 	glGenTextures(1,&texture);
 	
-
 	glBindTexture(GL_TEXTURE_2D,texture);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
 	//glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,2,2,0,GL_RGBA,GL_UNSIGNED_BYTE,textureByte);
@@ -206,6 +204,9 @@ bool HelloWorld::init()
 	glBindBuffer(GL_ARRAY_BUFFER,uvObj);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*2*4, triangleUV, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	mesh.Load("miku.pmd");
+	
     return true;
 }
 
@@ -232,6 +233,8 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
 void HelloWorld::draw(cocos2d::Renderer *renderer, const cocos2d::Mat4& transform, uint32_t flags)
 {
 #if 1
+	//Director::getInstance()->color(cocos2d::Color3B(255,200,200));
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_DEPTH_TEST);
@@ -244,6 +247,7 @@ void HelloWorld::draw(cocos2d::Renderer *renderer, const cocos2d::Mat4& transfor
 	glGetIntegerv(GL_CURRENT_PROGRAM,&nowPG);
 	glUseProgram(shader);
 
+#if 0
 	//アトリビュートに頂点バッファをバインド.
 	unsigned int attr = glGetAttribLocation(shader,"vertex");
 	glBindBuffer(GL_ARRAY_BUFFER,vertexObj);
@@ -264,9 +268,35 @@ void HelloWorld::draw(cocos2d::Renderer *renderer, const cocos2d::Mat4& transfor
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
 	glBindBuffer(GL_ARRAY_BUFFER,0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);  
+#endif // 0
 
+	static float d = 0;
+	d += 0.01f;
+	KJH::Mat world = KJH::Mat::RotateY(d);
+	KJH::Mat view = KJH::Mat::LookAtRH(KJH::Float3(30,30,-30),KJH::Float3(0,10,0),KJH::Float3(0,1,0));
+	KJH::Mat proj = KJH::Mat::PerspectiveFovRH(KJH::ToRadian(45),Director::getInstance()->getVisibleSize().width / Director::getInstance()->getVisibleSize().height,1,100);
+	
 
+	world = KJH::Mat::Transpose(world);
+	view = KJH::Mat::Transpose(view);
+	proj = KJH::Mat::Transpose(proj);
+
+	
+	//ビュー行列とプロジェクション行列を適用させる.
+	unsigned int attr = glGetUniformLocation(shader, "view");
+	glUniformMatrix4fv(attr, 1, GL_FALSE, (float*) &(view));
+	attr = glGetUniformLocation(shader, "proj");
+	glUniformMatrix4fv(attr, 1, GL_FALSE, (float*) &(proj));
+	attr = glGetUniformLocation(shader, "world");
+	glUniformMatrix4fv(attr, 1, GL_FALSE, (float*) &(world));
+
+	auto error = glGetError();
+	if(error != 0){
+		assert(0);
+	}
+	mesh.Draw(shader);
+	
 	////終わったら元に戻す.
 	glUseProgram(nowPG);
 

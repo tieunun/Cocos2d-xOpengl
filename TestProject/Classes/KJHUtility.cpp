@@ -1,4 +1,4 @@
-#include "Utility.h"
+#include "KJHUtility.h"
 
 namespace KJH
 {
@@ -21,7 +21,7 @@ static GLuint CreateShader(const std::string& filePath,const GLuint SHADER_TYPE)
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH , &bufSize);
 		char info[2048];
 		glGetShaderInfoLog(shader, bufSize, &length, info);
-		CCLOG("compiled: %s\n",info);
+		CCLOG("*************************************************\ncompiled: %s*************************************************",info);
 	}
 
 	delete[] data;
