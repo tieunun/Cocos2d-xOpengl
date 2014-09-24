@@ -1,0 +1,68 @@
+Android SDK: パソコンなどでAndroid向けソフトウェアを開発するための開発環境。
+             利用するには別途JDK(Java Development Kit)の導入が必要。
+
+Android NDK: Android は基本的にDalvikと呼ばれるJava仮想マシン上で動作するためJavaでの開発になる。
+             しかしAndroid NDKを使うことによりC++での開発が可能になる.
+
+Apache ANT: ビルドツール、Javaとかをビルドするためのツール
+
+Android ADT:Eclipse用のAndroidプラグイン
+
+
+JRE : Javaプログラムを実行するためのキット.
+JDK : Javaプログラムを作成するためのキット,JREも含まれる
+
+
+[導入手順]
+android SDK Managerを起動するためにjavaが必要なのでjdkをインストールする
+↓
+cococs2dxをダウンロードしてくる.
+↓
+setup.pyを実行(pythonが必要).
+↓
+パス設定を聞かれるのでインストールした場所のルートパスを設定.
+Android NDK(NDKのバージョンはcocos2dx3.2ではr9dのみ使える)
+Android SDK
+Apache ANT
+も同様にする
+
+
+
+[気をつけること]
+Android SDK Managerによって必要なsdkをコピーしておく.
+Android AVD Managerでデバイスを生成して立ち上げておく(GPU HostUseにチェックを入れる)
+CPUはARM系を選ぶ.
+
+Android.mkのLOCAL_SRC_FILESにClassesの.cppファイルを追加する----------------------------
+
+
+めんどくさいので自動化するために
+LOCAL_SRC_FILES のところを
+
+MY_CLASS_FILES := $(wildcard $(LOCAL_PATH)/../../Classes/*.cpp)
+LOCAL_SRC_FILES := hellocpp/main.cpp
+LOCAL_SRC_FILES += $(MY_CLASS_FILES:$(LOCAL_PATH)/%=%)
+
+にかきかえる
+
+----------------------------------------------------------------------------------------
+
+cocos run -p android　コマンドでコンパイルできる.
+別途コマンドプロンプトで adb logcat
+を起動しておくとログが見れる.
+
+
+ESでは使えない関数.
+glGetString(GL_GL_SHADING_LANGUAGE_VERSION)
+
+日本語パスの外部ファイルは禁止
+
+glsl注意.
+
+attribute 変数で頂点シェーダとフラグメントシェーダの両方で使われてない変数に
+glGetAttributeLocation等でアクセスしようとするとglErrorが発生するので一度吸収する.
+
+AndroidManifest.xmlの
+android:screenOrientation="landscape"
+で横持ち.
+android:screenOrientation="portrait"で縦持ち
