@@ -19,9 +19,9 @@ static GLuint CreateShader(const std::string& filePath,const GLuint SHADER_TYPE)
 	if(cvs == 0){
 		GLsizei bufSize, length;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH , &bufSize);
-		char info[2048];
+		char info[2048*2];
 		glGetShaderInfoLog(shader, bufSize, &length, info);
-		CCLOG("*************************************************\ncompiled: %s*************************************************",info);
+		CCLOGERROR("compiled: %s",info);
 	}
 
 	delete[] data;

@@ -27,7 +27,6 @@ namespace KJH
 
 	GLuint Mesh::Load(const char* filepath)
 	{
-		CCLOG("********************************Load Begin********************************");
 		auto fileUtils = cocos2d::FileUtils::sharedFileUtils();
 		std::string fullpath = fileUtils->fullPathForFilename(filepath);
 
@@ -205,7 +204,6 @@ namespace KJH
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,m_indexBuffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(m_index[0])*indexNum,&m_index[0],GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
-		CCLOG("********************************Load End********************************");
 		return 0;
 	}
 

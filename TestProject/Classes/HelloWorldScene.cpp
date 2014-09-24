@@ -31,6 +31,7 @@ Scene* HelloWorld::createScene()
 // on "init" you need to initialize your instance
 bool HelloWorld::init()
 {
+	CCLOG("********************************Load Begin********************************");
     //////////////////////////////
     // 1. super init first
 	if( !Layer::init() )
@@ -38,6 +39,7 @@ bool HelloWorld::init()
 		return false;
 	}
 	glClearColor(1.0,0.7,0.7,1.0);
+	CCLOG("********************************Check1********************************");
 
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -66,6 +68,7 @@ bool HelloWorld::init()
     // add a label shows "Hello World"
     // create and initialize a label
 
+	CCLOG("********************************Check2********************************");
 
 	//OpenGL 設定を表示.
 #if !WIN32
@@ -88,7 +91,7 @@ bool HelloWorld::init()
 	glRenderer += (const char*)glGetString(GL_RENDERER);
 	std::string glInfo = glVersion + "\n" + glShadingLanguageVersion + "\n" + glVendor + "\n" + glRenderer;
 #endif
-
+	CCLOG("********************************Check3********************************");
 	auto label = LabelTTF::create(glInfo.c_str(), "Arial", visibleSize.height*0.04,Size::ZERO,cocos2d::TextHAlignment::LEFT);
 
 	label->setAnchorPoint(cocos2d::Vec2(0,1));
@@ -98,6 +101,7 @@ bool HelloWorld::init()
 
 	// add the label as a child to this layer
 	this->addChild(label, 1);  
+	CCLOG("********************************Check4********************************");
 
 #if 0
 	// add "HelloWorld" splash screen"
@@ -112,9 +116,14 @@ bool HelloWorld::init()
 
 	//シェーダーのコンパイル.
 #if 1
+	CCLOG("********************************Check4.5********************************");
+	CCLOG("********************************Check VS********************************");
+
 	GLuint vs = KJH::VSCreateShader("shader.vsh");
+	CCLOG("********************************Check PS********************************");
 
 	GLuint fs = KJH::FSCreateShader("shader.fsh");
+	CCLOG("********************************Check5********************************");
 
 	shader = glCreateProgram();
 	glAttachShader(shader,vs);
@@ -127,6 +136,7 @@ bool HelloWorld::init()
 	}
 	glDeleteShader(vs);
 	glDeleteShader(fs);
+	CCLOG("********************************Check6********************************");
 
 
 
@@ -158,6 +168,7 @@ bool HelloWorld::init()
 
 
 #endif // 0
+	CCLOG("********************************Check7********************************");
 
 
 	unsigned char textureByte[][4] = {
@@ -192,6 +203,7 @@ bool HelloWorld::init()
 	
 	GLenum error = glGetError();
     
+	CCLOG("********************************Check8********************************");
 
 	float triangleUV[4][2] = {
 		{0, 0},
@@ -204,9 +216,14 @@ bool HelloWorld::init()
 	glBindBuffer(GL_ARRAY_BUFFER,uvObj);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*2*4, triangleUV, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	CCLOG("********************************MIKU********************************");
 
 	mesh.Load("miku.pmd");
-	
+	CCLOG("********************************Load End********************************");
+
+
+
+
     return true;
 }
 
@@ -291,12 +308,12 @@ void HelloWorld::draw(cocos2d::Renderer *renderer, const cocos2d::Mat4& transfor
 	attr = glGetUniformLocation(shader, "world");
 	glUniformMatrix4fv(attr, 1, GL_FALSE, (float*) &(world));
 
+	
+	mesh.Draw(shader);
 	auto error = glGetError();
 	if(error != 0){
 		assert(0);
 	}
-	mesh.Draw(shader);
-	
 	////終わったら元に戻す.
 	glUseProgram(nowPG);
 
