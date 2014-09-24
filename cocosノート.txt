@@ -62,6 +62,10 @@ glsl注意.
 attribute 変数で頂点シェーダとフラグメントシェーダの両方で使われてない変数に
 glGetAttributeLocation等でアクセスしようとするとglErrorが発生するので一度吸収する.
 
+attribute にはfloat型しか選択できない.
+浮動小数点にはすべて.0をつける(fはつけない).
+コンストラクタにはすべて引数を書く.
+
 AndroidManifest.xmlの
 android:screenOrientation="landscape"
 で横持ち.
