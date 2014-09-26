@@ -1,12 +1,14 @@
-#ifndef __HELLOWORLD_SCENE_H__
-#define __HELLOWORLD_SCENE_H__
+#ifndef __MAIN_SCENE_H__
+#define __MAIN_SCENE_H__
 
 #include "cocos2d.h"
 #include "KJHUtility.h"
 #include "KJHMesh.h"
 #include "KJHMath.h"
+#include "KJHGL.h"
 
-class HelloWorld : public cocos2d::Layer
+
+class MainScene : public cocos2d::Layer
 {
 public:
     // there's no 'id' in cpp, so we recommend returning the class instance pointer
@@ -19,10 +21,12 @@ public:
     void menuCloseCallback(cocos2d::Ref* pSender);
     
     // implement the "static create()" method manually
-    CREATE_FUNC(HelloWorld);
+    CREATE_FUNC(MainScene);
 
 
-	~HelloWorld();
+	~MainScene();
+
+	MainScene();
 
 	//-------------------------------------------------------------------------------------------------------------------------------------
 	//! @brief ÉVÅ[Éìï`âÊä÷êî.
@@ -30,10 +34,9 @@ public:
 	void draw(cocos2d::Renderer *renderer, const cocos2d::Mat4& transform, uint32_t flags);
 protected:
 
-	unsigned int shader,vertexObj,indexObj,uvObj;
-	GLuint texture;
-
+	unsigned int shader;
 	KJH::Mesh mesh;
+	KJH::GLStatus status;
 };
 
-#endif // __HELLOWORLD_SCENE_H__
+#endif // __MAIN_SCENE_H__

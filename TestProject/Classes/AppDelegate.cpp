@@ -1,5 +1,5 @@
 #include "AppDelegate.h"
-#include "HelloWorldScene.h"
+#include "MainScene.h"
 
 USING_NS_CC;
 static const std::string TITLE = "Opengl Test";
@@ -19,23 +19,18 @@ bool AppDelegate::applicationDidFinishLaunching() {
     auto glview = director->getOpenGLView();
     if(!glview) 
 	{
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-		glview = GLView::create(TITLE);
-		//glview = GLView::createWithRect(TITLE,cocos2d::Rect(0,0,WIDTH,HEIGHT));
-#else
-        glview = GLView::create(TITLE);
-#endif
+		glview = GLView::createWithRect(TITLE,cocos2d::Rect(0,0,WIDTH,HEIGHT));
 		director->setOpenGLView(glview);
     }
 
     // turn on display FPS
-    director->setDisplayStats(false);
+    director->setDisplayStats(true);
 
     // set FPS. the default value is 1.0/60 if you don't call this
-    director->setAnimationInterval(1.0 / 60);
-
+    director->setAnimationInterval(1.0 / 60.0);
+	//glfwSwapInterval(0);
     // create a scene. it's an autorelease object
-    auto scene = HelloWorld::createScene();
+    auto scene = MainScene::createScene();
 
     // run
     director->runWithScene(scene);

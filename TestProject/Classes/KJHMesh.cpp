@@ -11,6 +11,9 @@ namespace KJH
 		, m_vertexNum(0)
 		, m_vertexBuffer(0)
 		, m_indexBuffer(0)
+		, m_white(nullptr)
+		, m_boneQuaTrans()
+		, m_boneTex(0)
 	{
 
 	}
@@ -23,6 +26,14 @@ namespace KJH
 		if(m_indexBuffer){
 			glDeleteBuffers(1,&m_indexBuffer);
 		}
+
+		for(int i = 0; i < m_material.size(); ++i)
+		{
+			CC_SAFE_DELETE(m_material[i].tex);
+		}
+
+		CC_SAFE_DELETE(m_white);
+		glDeleteTextures(1,&m_boneTex);
 	}
 
 	GLuint Mesh::Load(const char* filepath)
@@ -80,8 +91,18 @@ namespace KJH
 			memcpy(&vertPmd,buffer + offset, 38);
 
 			m_vertex[i].pos = vertPmd.pos;
+			/*m_vertex[i].pos.x *= -1;
+			m_vertex[i].pos.z *= -1;*/
 			m_vertex[i].normal = vertPmd.normal;
+			/*m_vertex[i].normal.x *= -1;
+			m_vertex[i].normal.z *= -1;*/
 			m_vertex[i].uv = vertPmd.uv;
+			/*m_vertex[i].uv.x = 1.0f - m_vertex[i].uv.x;
+			m_vertex[i].uv.y = 1.0f - m_vertex[i].uv.y;*/
+			m_vertex[i].boneIdx.x = static_cast<float>(vertPmd.bone_num[0]);
+			m_vertex[i].boneIdx.y = static_cast<float>(vertPmd.bone_num[1]);
+			m_vertex[i].weight.x = static_cast<float>(vertPmd.bone_weight[0] * 0.01f);
+			m_vertex[i].weight.y = static_cast<float>((100 - vertPmd.bone_weight[0]) * 0.01f);
 			offset += 38;
 		}
 		//インデックス読み込み.
@@ -176,6 +197,7 @@ namespace KJH
 			buffer = 0;
 		}
 
+		m_white = KJH::Texture2D::CreateWhite();
 		//マテリアル格納.
 		m_material.resize(materialNum);
 		for(int i = 0; i < materialNum; ++i)
@@ -192,6 +214,26 @@ namespace KJH
 		}
 		//ボーン格納.
 		m_bone.resize(boneCnt);
+		m_bone_rotate.resize(boneCnt);
+		m_boneTranslate.resize(boneCnt);
+		m_boneQuaTrans.resize(boneCnt);
+		for(int i = 0; i < m_bone.size(); ++i)
+		{
+			if(pmdBone[i].parent_bone_index == 0xFFFF) m_bone[i].parent = NULL;
+			else m_bone[i].parent = &m_bone[ pmdBone[i].parent_bone_index ];
+
+			m_bone[i].offset.x = pmdBone[i].bone_head_pos[0];
+			m_bone[i].offset.y = pmdBone[i].bone_head_pos[1];
+			m_bone[i].offset.z = pmdBone[i].bone_head_pos[2];
+			
+		}
+
+		CCLOG("pmd:%s",filepath);
+		CCLOG("vertex:%d",vertexNum);
+		CCLOG("index:%d",indexNum);
+		CCLOG("polygon:%d",indexNum/3);
+		CCLOG("material:%d",materialNum);
+		CCLOG("bone:%d",boneCnt);
 
 		//構築.
 		glGenBuffers(1,&m_vertexBuffer);
@@ -204,29 +246,120 @@ namespace KJH
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,m_indexBuffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(m_index[0])*indexNum,&m_index[0],GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+
+		if(glGetError() != 0)
+		{
+			CCLOG("Bone Begin");
+			assert(0);
+		}
+		
+		glGenTextures(1,&m_boneTex);
+		glBindTexture(GL_TEXTURE_2D,m_boneTex);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
+
+		static Float4 f[1024*1024];
+
+		glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,1024,1024,0,GL_RGBA,GL_UNSIGNED_BYTE,nullptr);
+		
+		auto er = glGetError();
+		if(er != 0)
+		{
+			CCLOG("%d",er);
+			CCLOG("Bone Create Failed");
+			assert(0);
+		}
+
+
 		return 0;
 	}
 
 #define BUFFER_OFFSET(bytes) ((GLubyte *)NULL + (bytes))
 
+
+	Quaternion MeshBone::LocalRotate()
+	{
+		if(parent == nullptr) return rotate;
+		return parent->LocalRotate() * rotate;
+	}
+	Float3 MeshBone::LocalTranslate()
+	{
+		Float3 trans = rotate.MulVec(-offset) + translate + offset;
+		if(parent == nullptr) return trans;
+		return parent->LocalTranslate() + trans;
+	}
+
 	void Mesh::Draw(unsigned int shader)
 	{
-		//アトリビュートに頂点バッファをバインド.
+		m_bone[1].translate.z = 5;
+		//m_bone[1].rotate = Quaternion::RotAngle(Float3(-1,0,0),-1.57);
+		//m_bone[17].rotate = Quaternion::RotAngle(Float3(0,0,1),-1.57*0.5);
+		auto error = glGetError();
+		CCASSERT(error == 0,"SkinMesh");
+		for(int i = 0; i < m_bone.size(); ++i)
+		{
+			m_bone_rotate[i] = m_bone[i].LocalRotate();
+			m_boneTranslate[i] = m_bone[i].LocalTranslate();
+
+			m_boneQuaTrans[i].rotate = m_bone_rotate[i];
+			m_boneQuaTrans[i].translate.x = m_boneTranslate[i].x;
+			m_boneQuaTrans[i].translate.y = m_boneTranslate[i].y;
+			m_boneQuaTrans[i].translate.z = m_boneTranslate[i].z;
+		}
+
+		//glActiveTexture(GL_TEXTURE1);
+#if 0
+		glBindTexture(GL_TEXTURE_2D,m_boneTex);
+		glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,1024,1,0,GL_RGBA,GL_FLOAT,&m_boneQuaTrans[0]);
+		glBindTexture(GL_TEXTURE_2D,0);
+		auto boneID = glGetUniformLocation(shader,"bone_tex");
+
+		error = glGetError();
+		CCASSERT(error == 0,"Begin Attrib");  
+#endif // 0
+
+
+		//ボーンをセットする.
+		auto a = glGetUniformLocation(shader,"bone_quaternion");
+		glUniform4fv(a, m_bone_rotate.size(),(float*)&(m_bone_rotate[0]));
+		a = glGetUniformLocation(shader,"bone_translate");
+		glUniform3fv(a, m_boneTranslate.size(),(float*)&(m_boneTranslate[0]));
+		unsigned int attrOffset = 0;
 		//位置.
 		glBindBuffer(GL_ARRAY_BUFFER,m_vertexBuffer);
 		unsigned int attr = glGetAttribLocation(shader,"in_pos");
-		glVertexAttribPointer(attr,3,GL_FLOAT,GL_FALSE,sizeof(m_vertex[0]),NULL);
+		glVertexAttribPointer(attr,3,GL_FLOAT,GL_FALSE,sizeof(m_vertex[0]),(GLuint*)attrOffset);
 		glEnableVertexAttribArray(attr);
+		attrOffset += sizeof(m_vertex[0].pos);
+
 		//法線.
 		attr = glGetAttribLocation(shader,"in_normal");
-		glVertexAttribPointer(attr,3,GL_FLOAT,GL_FALSE,sizeof(m_vertex[0]),(GLuint*)sizeof(m_vertex[0].pos));
+		glVertexAttribPointer(attr,3,GL_FLOAT,GL_FALSE,sizeof(m_vertex[0]),(GLuint*)attrOffset);
 		glEnableVertexAttribArray(attr);
+		attrOffset += sizeof(m_vertex[0].normal);
 		//UV.
 		attr = glGetAttribLocation(shader,"in_uv");
-		glVertexAttribPointer(attr,2,GL_FLOAT,GL_FALSE,sizeof(m_vertex[0]),(GLuint*)(sizeof(m_vertex[0].pos)+sizeof(m_vertex[0].normal)));
+		glVertexAttribPointer(attr,2,GL_FLOAT,GL_FALSE,sizeof(m_vertex[0]),(GLuint*)attrOffset);
 		glEnableVertexAttribArray(attr);
-		auto error = glGetError();
-		assert(error == 0);
+		attrOffset += sizeof(m_vertex[0].uv);
+
+		error = glGetError();
+		CCASSERT(error == 0,"Attribute Failed1");
+		//ボーンインデックス.
+		attr = glGetAttribLocation(shader,"in_bone");
+		glVertexAttribPointer(attr,2,GL_FLOAT,GL_FALSE,sizeof(m_vertex[0]),(GLuint*)attrOffset);
+		glEnableVertexAttribArray(attr);
+		attrOffset += sizeof(m_vertex[0].boneIdx);
+		//ボーンウェイト.
+		attr = glGetAttribLocation(shader,"in_weight");
+		glVertexAttribPointer(attr,2,GL_FLOAT,GL_FALSE,sizeof(m_vertex[0]),(GLuint*)attrOffset);
+		glEnableVertexAttribArray(attr);
+		attrOffset += sizeof(m_vertex[0].weight);
+
+		error = glGetError();
+		CCASSERT(error == 0,"Attribute Failed2");
 
 		//インデックスバッファ.
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
@@ -237,13 +370,11 @@ namespace KJH
 			glUniform3fv(glGetUniformLocation(shader, "diffuse"), 1,(float*) &(m_material[i].diffuse));
 			glUniform3fv(glGetUniformLocation(shader, "ambient"), 1,(float*) &(m_material[i].ambient));
 			error = glGetError();
-			static KJH::Texture2D* pWhite = KJH::Texture2D::CreateWhite();
-
 			if(m_material[i].tex){
 				glBindTexture(GL_TEXTURE_2D,m_material[i].tex->GetTex());
 			}
 			else{
-				glBindTexture(GL_TEXTURE_2D,pWhite->GetTex());
+				glBindTexture(GL_TEXTURE_2D,m_white->GetTex());
 			}
 			//描画命令.
 			glDrawElements(GL_TRIANGLES,m_material[i].indexNum, GL_UNSIGNED_SHORT, BUFFER_OFFSET(offset));

@@ -69,4 +69,58 @@ namespace KJH
 			);
 	}
 
+
+
+
+	Quaternion::Quaternion(float ix,float iy,float iz,float iw)
+		: v(KJH::Float3(ix,iy,iz))
+		, w(iw)
+	{
+	}
+	
+	Quaternion::Quaternion(const Float3& obj,float iw)
+		: v(obj)
+		, w(iw)
+	{
+	}
+	//掛け算代入オペレータ.
+	Quaternion& Quaternion::operator*=(const Quaternion& rhs)
+	{
+		*this = (*this) * rhs;
+		return *this;
+	}
+	//掛け算オペレータ.
+	Quaternion Quaternion::operator*(const Quaternion& rhs)const
+	{
+		return Quaternion(rhs.v*w + v*rhs.w + Float3::Cross(v,rhs.v), 
+			w*rhs.w - Float3::Dot(v,rhs.v));
+	}
+	//共益を返す.
+	Quaternion Quaternion::Conjugate(const Quaternion& q)
+	{
+		return Quaternion(-q.v.x,-q.v.y,-q.v.z,q.w);
+	}
+	//回転軸と回転角度を元にクォータニオン生成.
+	Quaternion Quaternion::RotAngle(const Float3& axis,float radian)
+	{
+		float sinHalf = sin(radian*0.5f);
+		float cosHalf = cos(radian*0.5f);
+		return Quaternion(axis * sinHalf,cosHalf);
+	}
+	Float3 Quaternion::MulVec(const Float3& v)const
+	{
+		Quaternion res = Quaternion::Conjugate(*this) * Quaternion(v,0);
+		res = res * (*this);
+		return res.v;
+	}
+
+	/*Float3 operator*(const Quaternion& q,const Float3& v)
+	{
+		Quaternion res = Quaternion::Conjugate(q)  * Quaternion(v,0) * q;
+		return res.v;
+	}
+	Float3 operator*(const Float3& v,const Quaternion& q)
+	{
+		return q * v;
+	}*/
 };

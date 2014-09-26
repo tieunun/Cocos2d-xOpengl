@@ -8,7 +8,7 @@ namespace KJH
 	}
 	Texture2D::~Texture2D()
 	{
-
+		if(m_texture) glDeleteTextures(1,&m_texture);
 	}
 	Texture2D* Texture2D::Create(const std::string& filePath)
 	{

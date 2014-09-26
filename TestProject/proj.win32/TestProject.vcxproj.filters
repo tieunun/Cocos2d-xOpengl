@@ -10,6 +10,24 @@
     <Filter Include="resource">
       <UniqueIdentifier>{715254bc-d70b-4ec5-bf29-467dd3ace079}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Classes\KJH">
+      <UniqueIdentifier>{a3d73715-698f-4396-a2f9-c2818f24792b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes\KJH\Math">
+      <UniqueIdentifier>{634a23bc-9797-4391-b2e9-0aa50b46b845}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes\KJH\Render">
+      <UniqueIdentifier>{816f9227-b207-401d-8355-ef4497c6d4a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes\KJH\Texture">
+      <UniqueIdentifier>{9cd1fa0b-755b-4dfa-aa2e-59aa273feae7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes\KJH\Utility">
+      <UniqueIdentifier>{8d3c3ecb-322a-4487-8d58-2f1685390950}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes\KJH\GL">
+      <UniqueIdentifier>{9313a842-e9ba-444f-a43a-8ce0aa579d27}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -18,19 +36,28 @@
     <ClCompile Include="..\Classes\AppDelegate.cpp">
       <Filter>Classes</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\HelloWorldScene.cpp">
-      <Filter>Classes</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\KJHMath.cpp">
-      <Filter>Classes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\KJHUtility.cpp">
-      <Filter>Classes</Filter>
+      <Filter>Classes\KJH\Math</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\KJHMesh.cpp">
-      <Filter>Classes</Filter>
+      <Filter>Classes\KJH\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\KJHShape.cpp">
+      <Filter>Classes\KJH\Render</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\KJHTexture.cpp">
+      <Filter>Classes\KJH\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\KJHUtility.cpp">
+      <Filter>Classes\KJH\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\KJHTextureManager.cpp">
+      <Filter>Classes\KJH\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\KJHGL.cpp">
+      <Filter>Classes\KJH\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\MainScene.cpp">
       <Filter>Classes</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,19 +68,28 @@
     <ClInclude Include="..\Classes\AppDelegate.h">
       <Filter>Classes</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\HelloWorldScene.h">
-      <Filter>Classes</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\KJHMath.h">
-      <Filter>Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\KJHUtility.h">
-      <Filter>Classes</Filter>
+      <Filter>Classes\KJH\Math</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\KJHMesh.h">
-      <Filter>Classes</Filter>
+      <Filter>Classes\KJH\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\KJHShape.h">
+      <Filter>Classes\KJH\Render</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\KJHTexture.h">
+      <Filter>Classes\KJH\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\KJHUtility.h">
+      <Filter>Classes\KJH\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\KJHTextureManager.h">
+      <Filter>Classes\KJH\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\KJHGL.h">
+      <Filter>Classes\KJH\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\MainScene.h">
       <Filter>Classes</Filter>
     </ClInclude>
   </ItemGroup>

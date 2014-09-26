@@ -12,8 +12,8 @@ namespace KJH
 		Float3 pos;
 		Float3 normal;
 		Float2 uv;
+		Float2 boneIdx;
 		Float2 weight;
-		int16_t boneIdx[2];
 	};
 	typedef unsigned short MeshIndex;
 	
@@ -34,7 +34,26 @@ namespace KJH
 
 	struct MeshBone
 	{
-		
+		MeshBone* parent;	//êeÇ™Ç¢Ç»ÇØÇÍÇŒNULL.
+		Float3 offset;
+		Float3 translate;
+		Quaternion rotate;
+
+		MeshBone()
+			: parent(nullptr)
+			, translate()
+			, rotate()
+		{
+		}
+
+		Quaternion LocalRotate();
+		Float3 LocalTranslate();
+	};
+
+	struct QuaTrans
+	{
+		Quaternion rotate;
+		Float4 translate;
 	};
 
 	class Mesh
@@ -48,10 +67,18 @@ namespace KJH
 		std::vector<MeshVertex> m_vertex;
 		std::vector<MeshIndex> m_index;
 		std::vector<MeshMaterial> m_material;
-		std::vector<Mat> m_bone;
+		std::vector<MeshBone> m_bone;
+		std::vector<Quaternion> m_bone_rotate;
+		std::vector<Float3> m_boneTranslate;
+		std::vector<QuaTrans> m_boneQuaTrans;
+
 		GLuint m_vertexNum;
 		GLuint m_vertexBuffer;
 		GLuint m_indexBuffer;
+		KJH::Texture2D* m_white;
+		
+		GLuint m_boneTex;
+
 	};
 }
 

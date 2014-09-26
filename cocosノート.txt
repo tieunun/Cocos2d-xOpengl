@@ -70,3 +70,11 @@ AndroidManifest.xmlの
 android:screenOrientation="landscape"
 で横持ち.
 android:screenOrientation="portrait"で縦持ち
+
+adb logcat | grep "cocos2d-x"
+でcocos2d-xだけのログを出すことができる
+
+adbをデバイスに認識させるためにはandroid sdk/extras/google/usb_driver/android_winusb.inf
+にコントロールパネルから見れるデバイスIDを追加して
+android adb update
+コマンドの後にデバイスマネージャを開いてファイル指定してデバイスのインストールをする
