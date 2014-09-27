@@ -10,17 +10,17 @@
 #define hfloat float
 #endif
 
+//送る変数.
 varying hvec3 var_normal;
 varying hvec2 var_texCoord;
-
-uniform sampler2D texture1;
+//ユニフォーム変数.
 uniform sampler2D texture;
 uniform hvec3 diffuse;
 uniform hvec3 ambient;
 
 void main(void)
 {
-	hvec3 lightDir = normalize(vec3(1.0,-1.0,1.0));	
+	hvec3 lightDir = normalize(vec3(1.0,-1.0,-1.0));	
 	hfloat bright = dot(lightDir,var_normal);
 	bright = clamp(bright,0.0,1.0);
 	

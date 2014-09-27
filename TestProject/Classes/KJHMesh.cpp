@@ -2,7 +2,7 @@
 
 namespace KJH
 {
-
+#define BONE_TEX_SIZE 32
 	Mesh::Mesh()
 		: m_vertex()
 		, m_index()
@@ -252,18 +252,17 @@ namespace KJH
 			CCLOG("Bone Begin");
 			assert(0);
 		}
-		
+
+		auto a = GLEW_ARB_texture_float;
+
 		glGenTextures(1,&m_boneTex);
 		glBindTexture(GL_TEXTURE_2D,m_boneTex);
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
-
-		static Float4 f[1024*1024];
-
-		glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,1024,1024,0,GL_RGBA,GL_UNSIGNED_BYTE,nullptr);
-		
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+		//Float4 temp[BONE_TEX_SIZE * BONE_TEX_SIZE];
+		//glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,BONE_TEX_SIZE,BONE_TEX_SIZE,0,GL_RGBA,GL_FLOAT,&temp[0]);
 		auto er = glGetError();
 		if(er != 0)
 		{
@@ -293,7 +292,7 @@ namespace KJH
 
 	void Mesh::Draw(unsigned int shader)
 	{
-		m_bone[1].translate.z = 5;
+		m_bone[1].translate.z = 15;
 		//m_bone[1].rotate = Quaternion::RotAngle(Float3(-1,0,0),-1.57);
 		//m_bone[17].rotate = Quaternion::RotAngle(Float3(0,0,1),-1.57*0.5);
 		auto error = glGetError();
@@ -309,18 +308,7 @@ namespace KJH
 			m_boneQuaTrans[i].translate.z = m_boneTranslate[i].z;
 		}
 
-		//glActiveTexture(GL_TEXTURE1);
-#if 0
-		glBindTexture(GL_TEXTURE_2D,m_boneTex);
-		glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,1024,1,0,GL_RGBA,GL_FLOAT,&m_boneQuaTrans[0]);
-		glBindTexture(GL_TEXTURE_2D,0);
-		auto boneID = glGetUniformLocation(shader,"bone_tex");
-
-		error = glGetError();
-		CCASSERT(error == 0,"Begin Attrib");  
-#endif // 0
-
-
+#if 1
 		//ボーンをセットする.
 		auto a = glGetUniformLocation(shader,"bone_quaternion");
 		glUniform4fv(a, m_bone_rotate.size(),(float*)&(m_bone_rotate[0]));
@@ -345,8 +333,6 @@ namespace KJH
 		glEnableVertexAttribArray(attr);
 		attrOffset += sizeof(m_vertex[0].uv);
 
-		error = glGetError();
-		CCASSERT(error == 0,"Attribute Failed1");
 		//ボーンインデックス.
 		attr = glGetAttribLocation(shader,"in_bone");
 		glVertexAttribPointer(attr,2,GL_FLOAT,GL_FALSE,sizeof(m_vertex[0]),(GLuint*)attrOffset);
@@ -357,9 +343,33 @@ namespace KJH
 		glVertexAttribPointer(attr,2,GL_FLOAT,GL_FALSE,sizeof(m_vertex[0]),(GLuint*)attrOffset);
 		glEnableVertexAttribArray(attr);
 		attrOffset += sizeof(m_vertex[0].weight);
-
+#endif
 		error = glGetError();
-		CCASSERT(error == 0,"Attribute Failed2");
+		CCASSERT(error == 0,"Begin Attrib");
+		//テクスチャ番号取得.
+		auto boneID = glGetUniformLocation(shader,"bone_tex");
+		auto tex = glGetUniformLocation(shader,"texture");
+		//ピクセルを４バイトに.
+		//glPixelStorei(GL_UNPACK_ALIGNMENT,4);
+		
+
+
+		//ボーンテクスチャをバインド.
+		const GLint boneUnit = 1;
+		glActiveTexture(GL_TEXTURE0 + boneUnit);
+		glBindTexture(GL_TEXTURE_2D,m_boneTex);
+		Float4 temp[BONE_TEX_SIZE * BONE_TEX_SIZE];		//コピー用バッファ.
+		memset(temp,0,sizeof(temp));
+		memcpy(temp,&m_boneQuaTrans[0],sizeof(m_boneQuaTrans[0]) * m_boneQuaTrans.size());
+		//テクスチャに流し込む.
+		glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA32F,BONE_TEX_SIZE,BONE_TEX_SIZE,0,GL_RGBA,GL_FLOAT,temp);
+		glUniform1i(boneID,boneUnit);
+		
+		//通常状態に戻す.
+		glActiveTexture(GL_TEXTURE0);
+		error = glGetError();
+		CCASSERT(error == 0,"AAAAAAAAAAAAAAa");
+
 
 		//インデックスバッファ.
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
@@ -370,12 +380,9 @@ namespace KJH
 			glUniform3fv(glGetUniformLocation(shader, "diffuse"), 1,(float*) &(m_material[i].diffuse));
 			glUniform3fv(glGetUniformLocation(shader, "ambient"), 1,(float*) &(m_material[i].ambient));
 			error = glGetError();
-			if(m_material[i].tex){
-				glBindTexture(GL_TEXTURE_2D,m_material[i].tex->GetTex());
-			}
-			else{
-				glBindTexture(GL_TEXTURE_2D,m_white->GetTex());
-			}
+
+			auto texture = m_material[i].tex ? m_material[i].tex->GetTex() : m_white->GetTex();
+			glBindTexture(GL_TEXTURE_2D,texture);
 			//描画命令.
 			glDrawElements(GL_TRIANGLES,m_material[i].indexNum, GL_UNSIGNED_SHORT, BUFFER_OFFSET(offset));
 			offset += sizeof(m_index[0]) * m_material[i].indexNum;

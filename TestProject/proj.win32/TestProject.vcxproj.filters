@@ -98,4 +98,8 @@
       <Filter>resource</Filter>
     </ResourceCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Resources\shader.vsh" />
+    <None Include="..\Resources\shader.fsh" />
+  </ItemGroup>
 </Project>

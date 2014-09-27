@@ -182,8 +182,9 @@ void MainScene::draw(cocos2d::Renderer *renderer, const cocos2d::Mat4& transform
 
 	static float d = 0;
 	d += 0.01f;
+	//d = 0;//-1.57*0.5f;
 	KJH::Mat world = KJH::Mat::RotateY(d);
-	KJH::Mat view = KJH::Mat::LookAtRH(KJH::Float3(30,30,30),KJH::Float3(0,10,0),KJH::Float3(0,1,0));
+	KJH::Mat view = KJH::Mat::LookAtRH(KJH::Float3(30,30,-30),KJH::Float3(0,10,0),KJH::Float3(0,1,0));
 	KJH::Mat proj = KJH::Mat::PerspectiveFovRH(KJH::ToRadian(45),Director::getInstance()->getVisibleSize().width / Director::getInstance()->getVisibleSize().height,1,100);
 	
 	//world = KJH::Mat::Scale(0.05f);

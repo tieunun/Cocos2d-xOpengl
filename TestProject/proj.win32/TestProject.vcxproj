@@ -97,6 +97,10 @@
       <Command>if not exist "$(OutDir)" mkdir "$(OutDir)"
 xcopy /Y /Q "$(EngineRoot)external\websockets\prebuilt\win32\*.*" "$(OutDir)"</Command>
     </PreLinkEvent>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -170,6 +174,10 @@ xcopy /Y /Q "$(EngineRoot)external\websockets\prebuilt\win32\*.*" "$(OutDir)"</C
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="game.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Resources\shader.fsh" />
+    <None Include="..\Resources\shader.vsh" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
